@@ -27,7 +27,7 @@ def test1():
     x = np.array([[0, 0, 0, 0]]).T
     for i in range(10000):
         timelist.append(i * dt)
-        u = -1 * (x[2][0] - 5.0)
+        u = -0.1 * (x[2][0] - 3.0) - 0.05 * x[3][0]
         x = calc_next(x, u)
         datalist.append(x[2][0])
     return timelist, datalist
@@ -91,6 +91,13 @@ def calc_u(K, f_list, x, ref_x):
         u = u + np.dot(f, ref_x)
     return u
 
+def calc_u_from_2refx(K, f_list, x, refx_start, refx_goal):
+    u = np.dot(-K, x)
+    for i in range(len(f_list)):
+        ref_x = refx_start + (refx_goal - refx_start) / (len(f_list)) * i
+        u = u + np.dot(f_list[i], ref_x)
+    return u
+
 def test2():
     dim_x = A.shape[0]
     dim_u = B.shape[1]
@@ -106,15 +113,20 @@ def test2():
 
     timelist = []
     datalist = []
-    ref_x = np.array([[0, 0, 5, 0]]).T
+    ref_x = np.array([[0, 0, 3, 0]]).T
     x = np.array([[0,0,0,0]]).T
+    goaltime = 5.0
+    goalcount = goaltime / dt
     for i in range(10000):
         timelist.append(i * dt)
-        u = calc_u(K, f_list, x, ref_x)
+        refx_start = ref_x * (i if (i < goalcount) else goalcount) / goalcount
+        refx_goal = ref_x * ((i + 2.0 / dt) if (i + 2.0 / dt < goalcount) else goalcount) / goalcount
+        u = calc_u_from_2refx(K, f_list, x, refx_start, refx_goal)
         x = calc_next(x, u[0,0])
         datalist.append(x[2][0])
     return timelist, datalist
-    
+
+
 def view_result():
     timelist1, datalist1 = test1()
     timelist2, datalist2 = test2()
