@@ -12,7 +12,7 @@ A = np.array([[1.0, dt, 0.0, 0.0],
               [0.0, 0.0, 1.0, dt],
               [k * dt / m2, 0.0, -k * dt / m2, 1.0 - d * dt / m2]])
 
-B = np.array([[0.0, dt / m1, 0.0, 0.0]]).T
+B = np.array([[0.5 * dt * dt, dt / m1, 0.0, 0.0]]).T
 
 c = np.array([[0, 0, 1, 0]])
 
@@ -27,7 +27,7 @@ def test1():
     x = np.array([[0, 0, 0, 0]]).T
     for i in range(10000):
         timelist.append(i * dt)
-        u = -0.1 * (x[2][0] - 3.0) - 0.05 * x[3][0]
+        u = -0.1 * (x[2][0] - 10.0) - 0.05 * x[3][0]
         x = calc_next(x, u)
         datalist.append(x[2][0])
     return timelist, datalist
@@ -113,7 +113,7 @@ def test2():
 
     timelist = []
     datalist = []
-    ref_x = np.array([[0, 0, 3, 0]]).T
+    ref_x = np.array([[0, 0, 10, 0]]).T
     x = np.array([[0,0,0,0]]).T
     goaltime = 5.0
     goalcount = goaltime / dt
